@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Öğrenci Takip Sistemi</title>
+    <style>
+        body {
+            background-image: url('background.png');
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            color: #e0e0e0;
+            background-color: #1a1a1a;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 2.5em;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px #000000;
+        }
+
+        .button-container, .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-top: 50px;
+        }
+
+        .button-container button, .form-container button {
+            margin: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #2b2b2b;
+            color: #ffffff;
+            border: 2px solid #3a3a3a;
+            border-radius: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 2px 2px 5px #000000;
+        }
+
+        .button-container button:hover, .form-container button:hover {
+            background-color: #3a3a3a;
+            transform: scale(1.05);
+            box-shadow: 4px 4px 10px #000000;
+        }
+
+        .form-container input, .form-container select {
+            padding: 12px;
+            margin: 12px 0;
+            width: 270px;
+            box-sizing: border-box;
+            border-radius: 10px;
+            border: 2px solid #555555;
+            background-color: #2b2b2b;
+            color: #ffffff;
+            box-shadow: inset 1px 1px 3px #000000;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .content {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .form-container p {
+            margin: 0;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .ders-bilgileri {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .ders-bilgileri ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .ders-bilgileri li {
+            margin: 10px 0;
+            background-color: #2b2b2b;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #ffffff;
+            border: 2px solid #3a3a3a;
+            box-shadow: 2px 2px 5px #000000;
+            position: relative;
+        }
+
+        .ders-bilgileri li:hover {
+            background-color: #3a3a3a;
+            transform: scale(1.02);
+            box-shadow: 4px 4px 10px #000000;
+        }
+
+        .sil-buton {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: #ff4c4c;
+            color: #ffffff;
+            border: none;
+            border-radius: 50%;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .sil-buton:hover {
+            background-color: #ff1c1c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Öğrenci Takip Sistemi</h1>
+    <div class="button-container">
+        <button onclick="ogrenciListesiniGoster()">Öğrenci Listesi</button>
+        <button onclick="ogrenciEklemeFormuGoster()">Öğrenci Ekle</button>
+    </div>
+
+    <div id="ogrenci-listesi" class="content hidden">
+        <h2>Öğrenci Listesi</h2>
+        <ul id="ogrenciler"></ul>
+        <button onclick="geriDon()">Geri Dön</button>
+    </div>
+
+    <div id="ogrenci-bilgileri" class="content hidden">
+        <h2>Yeni Öğrenci Ekle</h2>
+        <div class="form-container">
+            <p>Ad:</p> <input type="text" id="yeniAd">
+            <p>Soyad:</p> <input type="text" id="yeniSoyad">
+            <p>Ders Ücreti:</p> <input type="number" id="yeniUcret">
+            <button onclick="yeniOgrenciEkle()">Öğrenciyi Kaydet</button>
+            <button onclick="geriDon()">Geri Dön</button>
+        </div>
+    </div>
+
+    <div id="ogrenci-detay" class="content hidden">
+        <h2 id="ogrenciAdi"></h2>
+        <div class="form-container">
+            <p>Ders Tarihi:</p> <input type="date" id="dersTarihi">
+            <p>Ders Saati:</p> <input type="time" id="dersSaati">
+            <p>Ders Konusu:</p> <input type="text" id="dersKonusu">
+            <p>Ücret Ödendi mi?</p> 
+            <select id="ucretOdenme">
+                <option value="Hayır">Hayır</option>
+                <option value="Evet">Evet</option>
+            </select>
+            <button onclick="dersEkle()">Ders Ekle</button>
+            <button onclick="geriDon()">Geri Dön</button>
+        </div>
+        <div class="ders-bilgileri">
+            <h3>Mevcut Dersler</h3>
+            <ul id="dersListesi"></ul>
+        </div>
+    </div>
+
+    <script>
+        let ogrenciler = [];
+
+        function ogrenciListesiniGoster() {
+            document.getElementById('ogrenci-listesi').classList.remove('hidden');
+            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
+            document.getElementById('ogrenci-detay').classList.add('hidden');
+            document.querySelector('.button-container').classList.add('hidden');
+            listeyiGuncelle();
+        }
+
+        function ogrenciEklemeFormuGoster() {
+            document.getElementById('ogrenci-bilgileri').classList.remove('hidden');
+            document.getElementById('ogrenci-listesi').classList.add('hidden');
+            document.getElementById('ogrenci-detay').classList.add('hidden');
+            document.querySelector('.button-container').classList.add('hidden');
+        }
+
+        function geriDon() {
+            document.getElementById('ogrenci-listesi').classList.add('hidden');
+            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
+            document.getElementById('ogrenci-detay').classList.add('hidden');
+            document.querySelector('.button-container').classList.remove('hidden');
+        }
+
+        function yeniOgrenciEkle() {
+            const ad = document.getElementById('yeniAd').value;
+            const soyad = document.getElementById('yeniSoyad').value;
+            const ucret = document.getElementById('yeniUcret').value;
+
+            if (ad && soyad && ucret) {
+                ogrenciler.push({ ad: ad, soyad: soyad, ucret: ucret, dersler: [] });
+                document.getElementById('yeniAd').value = '';
+                document.getElementById('yeniSoyad').value = '';
+                document.getElementById('yeniUcret').value = '';
+                alert(ad + " " + soyad + " eklendi!");
+            } else {
+                alert("Lütfen tüm bilgileri doldurun.");
+            }
+        }
+
+        function listeyiGuncelle() {
+            const ogrenciListesi = document.getElementById('ogrenciler');
+            ogrenciListesi.innerHTML = '';
+
+            ogrenciler.forEach((ogrenci, index) => {
+                const li = document.createElement('li');
+                li.textContent = ogrenci.ad + " " + ogrenci.soyad;
+                li.onclick = () => ogrenciBilgileriniGoster(index);
+
+                // Öğrenci silme butonu
+                const silButon = document.createElement('button');
+                silButon.textContent = 'X';
+                silButon.className = 'sil-buton';
+                silButon.onclick = (event) => {
+                    event.stopPropagation();
+                    ogrenciSil(index);
+                };
+
+                li.appendChild(silButon);
+                ogrenciListesi.appendChild(li);
+            });
+        }
+
+        function ogrenciBilgileriniGoster(index) {
+            const ogrenci = ogrenciler[index];
+            document.getElementById('ogrenciAdi').textContent = ogrenci.ad + " " + ogrenci.soyad;
+            document.getElementById('ogrenci-listesi').classList.add('hidden');
+            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
+            document.getElementById('ogrenci-detay').classList.remove('hidden');
+            document.querySelector('.button-container').classList.add('hidden');
+            dersListesiniGuncelle(index);
+        }
+
+        function dersEkle() {
+            const tarih = document.getElementById('dersTarihi').value;
+            const saat = document.getElementById('dersSaati').value;
+            const konu = document.getElementById('dersKonusu').value;
+            const ucret = document.getElementById('ucretOdenme').value;
+            const index = ogrenciler.findIndex(o => o.ad + " " + o.soyad === document.getElementById('ogrenciAdi').textContent);
+
+            if (tarih && saat && konu) {
+                ogrenciler[index].dersler.push({ tarih: tarih, saat: saat, konu: konu, ucret: ucret });
+                dersListesiniGuncelle(index);
+                alert("Ders eklendi!");
+            } else {
+                alert("Lütfen tüm bilgileri doldurun.");
+            }
+        }
+
+        function dersListesiniGuncelle(index) {
+            const dersListesi = document.getElementById('dersListesi');
+            dersListesi.innerHTML = '';
+
+            ogrenciler[index].dersler.forEach((ders, dersIndex) => {
+                const li = document.createElement('li');
+                li.textContent = (dersIndex + 1) + ". Ders - Tarih: " + ders.tarih + " Saat: " + ders.saat + ", Konu: " + ders.konu + ", Ücret Ödendi mi?: " + ders.ucret;
+
+                // Ders silme butonu
+                const silButon = document.createElement('button');
+                silButon.textContent = 'X';
+                silButon.className = 'sil-buton';
+                silButon.onclick = (event) => {
+                    event.stopPropagation();
+                    dersSil(index, dersIndex);
+                };
+
+                li.appendChild(silButon);
+                dersListesi.appendChild(li);
+            });
+        }
+
+        function dersSil(ogrenciIndex, dersIndex) {
+            ogrenciler[ogrenciIndex].dersler.splice(dersIndex, 1);
+            dersListesiniGuncelle(ogrenciIndex);
+            alert("Ders silindi!");
+        }
+
+        function ogrenciSil(index) {
+            ogrenciler.splice(index, 1);
+            listeyiGuncelle();
+            alert("Öğrenci silindi!");
+        }
+
+        function dersDuzenle(ogrenciIndex, dersIndex) {
+            const ders = ogrenciler[ogrenciIndex].dersler[dersIndex];
+            const yeniTarih = prompt("Yeni tarih girin (YYYY-AA-GG):", ders.tarih);
+            const yeniSaat = prompt("Yeni saat girin (SS:DD):", ders.saat);
+            const yeniKonu = prompt("Yeni konuyu girin:", ders.konu);
+            const yeniUcret = prompt("Ücret ödendi mi? (Evet/Hayır):", ders.ucret);
+
+            if (yeniTarih && yeniSaat && yeniKonu) {
+                ogrenciler[ogrenciIndex].dersler[dersIndex] = { tarih: yeniTarih, saat: yeniSaat, konu: yeniKonu, ucret: yeniUcret };
+                dersListesiniGuncelle(ogrenciIndex);
+                alert("Ders güncellendi!");
+            } else {
+                alert("Tüm bilgileri doldurmanız gerekmektedir.");
+            }
+        }
+    </script>
+</body>
+</html>
