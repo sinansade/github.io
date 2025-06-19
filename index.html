@@ -3,309 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğrenci Takip Sistemi</title>
+    <title>MyPlanner</title>
     <style>
         body {
-            background-image: url('background.png');
-            background-size: cover;
-            background-position: center;
+            font-family: Arial, Helvetica, sans-serif;
             margin: 0;
-            font-family: 'Roboto', sans-serif;
-            color: #e0e0e0;
-            background-color: #1a1a1a;
+            background: #f4f4f4;
+            color: #333;
         }
-
-        h1 {
+        header {
+            background: #4a90e2;
+            color: white;
+            padding: 1rem;
             text-align: center;
-            margin-top: 20px;
-            font-size: 2.5em;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000000;
+            font-size: 2rem;
         }
-
-        .button-container, .form-container {
+        .date-nav {
             display: flex;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            margin-top: 50px;
+            padding: 1rem;
+            gap: .5rem;
         }
-
-        .button-container button, .form-container button {
-            margin: 10px;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            background-color: #2b2b2b;
-            color: #ffffff;
-            border: 2px solid #3a3a3a;
-            border-radius: 10px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 2px 2px 5px #000000;
+        .task-section {
+            margin: 1rem auto;
+            max-width: 800px;
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
-        .button-container button:hover, .form-container button:hover {
-            background-color: #3a3a3a;
-            transform: scale(1.05);
-            box-shadow: 4px 4px 10px #000000;
+        .task-section h2 {
+            margin-top: 0;
         }
-
-        .form-container input, .form-container select {
-            padding: 12px;
-            margin: 12px 0;
-            width: 270px;
-            box-sizing: border-box;
-            border-radius: 10px;
-            border: 2px solid #555555;
-            background-color: #2b2b2b;
-            color: #ffffff;
-            box-shadow: inset 1px 1px 3px #000000;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .content {
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .form-container p {
-            margin: 0;
-            font-weight: bold;
-            color: #ffffff;
-        }
-
-        .ders-bilgileri {
-            margin-top: 20px;
-            text-align: left;
-        }
-
-        .ders-bilgileri ul {
-            list-style-type: none;
+        ul {
+            list-style: none;
             padding: 0;
         }
-
-        .ders-bilgileri li {
-            margin: 10px 0;
-            background-color: #2b2b2b;
-            padding: 12px;
-            border-radius: 10px;
+        li {
+            padding: .5rem;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        li:last-child {
+            border-bottom: none;
+        }
+        .priority-high {
+            color: #e74c3c;
+        }
+        .priority-medium {
+            color: #f39c12;
+        }
+        .priority-low {
+            color: #2ecc71;
+        }
+        .completed {
+            text-decoration: line-through;
+            opacity: .6;
+        }
+        button {
             cursor: pointer;
-            color: #ffffff;
-            border: 2px solid #3a3a3a;
-            box-shadow: 2px 2px 5px #000000;
-            position: relative;
         }
-
-        .ders-bilgileri li:hover {
-            background-color: #3a3a3a;
-            transform: scale(1.02);
-            box-shadow: 4px 4px 10px #000000;
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
         }
-
-        .sil-buton {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background-color: #ff4c4c;
-            color: #ffffff;
-            border: none;
-            border-radius: 50%;
-            padding: 5px;
-            cursor: pointer;
-            font-size: 12px;
+        .modal-content {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
         }
-
-        .sil-buton:hover {
-            background-color: #ff1c1c;
+        .modal-content label {
+            display: block;
+            margin-top: .5rem;
+        }
+        .subtask-row {
+            display: flex;
+            gap: .5rem;
+            margin-top: .5rem;
+        }
+        .subtask-row input {
+            flex: 1;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Öğrenci Takip Sistemi</h1>
-    <div class="button-container">
-        <button onclick="ogrenciListesiniGoster()">Öğrenci Listesi</button>
-        <button onclick="ogrenciEklemeFormuGoster()">Öğrenci Ekle</button>
+    <header>MyPlanner</header>
+    <div class="date-nav">
+        <button id="prevDay">&lt;</button>
+        <input type="date" id="datePicker">
+        <button id="nextDay">&gt;</button>
     </div>
 
-    <div id="ogrenci-listesi" class="content hidden">
-        <h2>Öğrenci Listesi</h2>
-        <ul id="ogrenciler"></ul>
-        <button onclick="geriDon()">Geri Dön</button>
-    </div>
+    <section id="carryover" class="task-section hidden">
+        <h2>Yapılmayan Görevler</h2>
+        <ul id="carryoverTasks"></ul>
+    </section>
 
-    <div id="ogrenci-bilgileri" class="content hidden">
-        <h2>Yeni Öğrenci Ekle</h2>
-        <div class="form-container">
-            <p>Ad:</p> <input type="text" id="yeniAd">
-            <p>Soyad:</p> <input type="text" id="yeniSoyad">
-            <p>Ders Ücreti:</p> <input type="number" id="yeniUcret">
-            <button onclick="yeniOgrenciEkle()">Öğrenciyi Kaydet</button>
-            <button onclick="geriDon()">Geri Dön</button>
-        </div>
-    </div>
+    <section id="tasksToday" class="task-section">
+        <h2>Bugünün Görevleri</h2>
+        <ul id="taskList"></ul>
+        <button id="addTask">Görev Ekle</button>
+    </section>
 
-    <div id="ogrenci-detay" class="content hidden">
-        <h2 id="ogrenciAdi"></h2>
-        <div class="form-container">
-            <p>Ders Tarihi:</p> <input type="date" id="dersTarihi">
-            <p>Ders Saati:</p> <input type="time" id="dersSaati">
-            <p>Ders Konusu:</p> <input type="text" id="dersKonusu">
-            <p>Ücret Ödendi mi?</p> 
-            <select id="ucretOdenme">
-                <option value="Hayır">Hayır</option>
-                <option value="Evet">Evet</option>
-            </select>
-            <button onclick="dersEkle()">Ders Ekle</button>
-            <button onclick="geriDon()">Geri Dön</button>
-        </div>
-        <div class="ders-bilgileri">
-            <h3>Mevcut Dersler</h3>
-            <ul id="dersListesi"></ul>
+    <section id="completedSection" class="task-section hidden">
+        <h2>Tamamlanan Görevler</h2>
+        <ul id="completedList"></ul>
+    </section>
+
+    <div id="taskModal" class="modal">
+        <div class="modal-content">
+            <h3>Görev Ekle</h3>
+            <form id="taskForm">
+                <label>Başlık
+                    <input type="text" id="taskTitle" required>
+                </label>
+                <label>Öncelik
+                    <select id="taskPriority">
+                        <option value="low">Düşük</option>
+                        <option value="medium">Orta</option>
+                        <option value="high">Yüksek</option>
+                    </select>
+                </label>
+                <div id="subtasks">
+                    <h4>Alt Görevler</h4>
+                </div>
+                <button type="button" id="addSubtask">Alt Görev Ekle</button>
+                <label>Açıklama
+                    <textarea id="taskNotes"></textarea>
+                </label>
+                <div style="margin-top:1rem;text-align:right">
+                    <button type="submit">Kaydet</button>
+                    <button type="button" id="cancelTask">İptal</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
-        let ogrenciler = [];
+        const dateInput = document.getElementById('datePicker');
+        const taskList = document.getElementById('taskList');
+        const completedList = document.getElementById('completedList');
+        const carryoverList = document.getElementById('carryoverTasks');
+        const carryoverSection = document.getElementById('carryover');
+        const completedSection = document.getElementById('completedSection');
+        const taskModal = document.getElementById('taskModal');
+        const subtasksDiv = document.getElementById('subtasks');
 
-        function ogrenciListesiniGoster() {
-            document.getElementById('ogrenci-listesi').classList.remove('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
-            listeyiGuncelle();
+        dateInput.addEventListener('change', loadForDate);
+        document.getElementById('prevDay').addEventListener('click', () => navigate(-1));
+        document.getElementById('nextDay').addEventListener('click', () => navigate(1));
+        document.getElementById('addTask').addEventListener('click', openModal);
+        document.getElementById('cancelTask').addEventListener('click', closeModal);
+        document.getElementById('taskForm').addEventListener('submit', saveTask);
+        document.getElementById('addSubtask').addEventListener('click', addSubtaskInput);
+
+        function getData() {
+            return JSON.parse(localStorage.getItem('myplanner-tasks') || '{}');
         }
-
-        function ogrenciEklemeFormuGoster() {
-            document.getElementById('ogrenci-bilgileri').classList.remove('hidden');
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
+        function setData(data) {
+            localStorage.setItem('myplanner-tasks', JSON.stringify(data));
         }
-
-        function geriDon() {
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.remove('hidden');
+        function navigate(offset) {
+            const d = new Date(dateInput.value);
+            d.setDate(d.getDate() + offset);
+            dateInput.value = d.toISOString().slice(0,10);
+            loadForDate();
         }
-
-        function yeniOgrenciEkle() {
-            const ad = document.getElementById('yeniAd').value;
-            const soyad = document.getElementById('yeniSoyad').value;
-            const ucret = document.getElementById('yeniUcret').value;
-
-            if (ad && soyad && ucret) {
-                ogrenciler.push({ ad: ad, soyad: soyad, ucret: ucret, dersler: [] });
-                document.getElementById('yeniAd').value = '';
-                document.getElementById('yeniSoyad').value = '';
-                document.getElementById('yeniUcret').value = '';
-                alert(ad + " " + soyad + " eklendi!");
-            } else {
-                alert("Lütfen tüm bilgileri doldurun.");
+        function openModal() {
+            taskModal.style.display = 'flex';
+            document.getElementById('taskForm').reset();
+            subtasksDiv.innerHTML = '<h4>Alt Görevler</h4>';
+        }
+        function closeModal() { taskModal.style.display = 'none'; }
+        function addSubtaskInput(value='') {
+            const row = document.createElement('div');
+            row.className = 'subtask-row';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = value;
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.textContent = 'X';
+            remove.onclick = () => row.remove();
+            row.appendChild(input);
+            row.appendChild(remove);
+            subtasksDiv.appendChild(row);
+        }
+        function saveTask(e) {
+            e.preventDefault();
+            const data = getData();
+            const dateKey = dateInput.value;
+            const task = {
+                id: Date.now(),
+                title: document.getElementById('taskTitle').value,
+                priority: document.getElementById('taskPriority').value,
+                notes: document.getElementById('taskNotes').value,
+                completed: false,
+                subtasks: Array.from(subtasksDiv.querySelectorAll('input')).map(i => ({ id: Date.now()+Math.random(), title: i.value, completed: false }))
+            };
+            if (!data[dateKey]) data[dateKey] = [];
+            data[dateKey].push(task);
+            setData(data);
+            closeModal();
+            loadForDate();
+        }
+        function toggleTask(dateKey, taskId, completed) {
+            const data = getData();
+            const tasks = data[dateKey] || [];
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                task.completed = completed;
+                setData(data);
+                loadForDate();
             }
         }
+        function toggleSubtask(dateKey, taskId, subId, completed) {
+            const data = getData();
+            const tasks = data[dateKey] || [];
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                const sub = task.subtasks.find(s => s.id === subId);
+                if (sub) {
+                    sub.completed = completed;
+                    setData(data);
+                    loadForDate();
+                }
+            }
+        }
+        function createTaskElement(dateKey, task) {
+            const li = document.createElement('li');
+            const left = document.createElement('div');
+            const cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = task.completed;
+            cb.onchange = () => toggleTask(dateKey, task.id, cb.checked);
+            const title = document.createElement('span');
+            title.textContent = task.title;
+            title.className = 'priority-' + task.priority + (task.completed ? ' completed' : '');
+            left.appendChild(cb);
+            left.appendChild(title);
 
-        function listeyiGuncelle() {
-            const ogrenciListesi = document.getElementById('ogrenciler');
-            ogrenciListesi.innerHTML = '';
-
-            ogrenciler.forEach((ogrenci, index) => {
-                const li = document.createElement('li');
-                li.textContent = ogrenci.ad + " " + ogrenci.soyad;
-                li.onclick = () => ogrenciBilgileriniGoster(index);
-
-                // Öğrenci silme butonu
-                const silButon = document.createElement('button');
-                silButon.textContent = 'X';
-                silButon.className = 'sil-buton';
-                silButon.onclick = (event) => {
-                    event.stopPropagation();
-                    ogrenciSil(index);
-                };
-
-                li.appendChild(silButon);
-                ogrenciListesi.appendChild(li);
+            if (task.subtasks && task.subtasks.length) {
+                const ul = document.createElement('ul');
+                task.subtasks.forEach(sub => {
+                    const subLi = document.createElement('li');
+                    const subCb = document.createElement('input');
+                    subCb.type = 'checkbox';
+                    subCb.checked = sub.completed;
+                    subCb.onchange = () => toggleSubtask(dateKey, task.id, sub.id, subCb.checked);
+                    const subSpan = document.createElement('span');
+                    subSpan.textContent = sub.title;
+                    if(sub.completed) subSpan.classList.add('completed');
+                    subLi.appendChild(subCb);
+                    subLi.appendChild(subSpan);
+                    ul.appendChild(subLi);
+                });
+                left.appendChild(ul);
+            }
+            li.appendChild(left);
+            return li;
+        }
+        function loadForDate() {
+            const data = getData();
+            const dateKey = dateInput.value;
+            const tasks = data[dateKey] || [];
+            taskList.innerHTML = '';
+            completedList.innerHTML = '';
+            tasks.forEach(task => {
+                const el = createTaskElement(dateKey, task);
+                if (task.completed) {
+                    completedList.appendChild(el);
+                } else {
+                    taskList.appendChild(el);
+                }
             });
-        }
+            completedSection.classList.toggle('hidden', completedList.children.length === 0);
 
-        function ogrenciBilgileriniGoster(index) {
-            const ogrenci = ogrenciler[index];
-            document.getElementById('ogrenciAdi').textContent = ogrenci.ad + " " + ogrenci.soyad;
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.remove('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
-            dersListesiniGuncelle(index);
-        }
-
-        function dersEkle() {
-            const tarih = document.getElementById('dersTarihi').value;
-            const saat = document.getElementById('dersSaati').value;
-            const konu = document.getElementById('dersKonusu').value;
-            const ucret = document.getElementById('ucretOdenme').value;
-            const index = ogrenciler.findIndex(o => o.ad + " " + o.soyad === document.getElementById('ogrenciAdi').textContent);
-
-            if (tarih && saat && konu) {
-                ogrenciler[index].dersler.push({ tarih: tarih, saat: saat, konu: konu, ucret: ucret });
-                dersListesiniGuncelle(index);
-                alert("Ders eklendi!");
-            } else {
-                alert("Lütfen tüm bilgileri doldurun.");
-            }
-        }
-
-        function dersListesiniGuncelle(index) {
-            const dersListesi = document.getElementById('dersListesi');
-            dersListesi.innerHTML = '';
-
-            ogrenciler[index].dersler.forEach((ders, dersIndex) => {
-                const li = document.createElement('li');
-                li.textContent = (dersIndex + 1) + ". Ders - Tarih: " + ders.tarih + " Saat: " + ders.saat + ", Konu: " + ders.konu + ", Ücret Ödendi mi?: " + ders.ucret;
-
-                // Ders silme butonu
-                const silButon = document.createElement('button');
-                silButon.textContent = 'X';
-                silButon.className = 'sil-buton';
-                silButon.onclick = (event) => {
-                    event.stopPropagation();
-                    dersSil(index, dersIndex);
-                };
-
-                li.appendChild(silButon);
-                dersListesi.appendChild(li);
+            const yesterday = new Date(dateKey);
+            yesterday.setDate(yesterday.getDate()-1);
+            const yKey = yesterday.toISOString().slice(0,10);
+            const carry = (data[yKey] || []).filter(t => !t.completed);
+            carryoverList.innerHTML = '';
+            carry.forEach(t => {
+                const el = document.createElement('li');
+                el.textContent = t.title;
+                carryoverList.appendChild(el);
             });
+            carryoverSection.classList.toggle('hidden', carry.length === 0);
         }
 
-        function dersSil(ogrenciIndex, dersIndex) {
-            ogrenciler[ogrenciIndex].dersler.splice(dersIndex, 1);
-            dersListesiniGuncelle(ogrenciIndex);
-            alert("Ders silindi!");
-        }
-
-        function ogrenciSil(index) {
-            ogrenciler.splice(index, 1);
-            listeyiGuncelle();
-            alert("Öğrenci silindi!");
-        }
-
-        function dersDuzenle(ogrenciIndex, dersIndex) {
-            const ders = ogrenciler[ogrenciIndex].dersler[dersIndex];
-            const yeniTarih = prompt("Yeni tarih girin (YYYY-AA-GG):", ders.tarih);
-            const yeniSaat = prompt("Yeni saat girin (SS:DD):", ders.saat);
-            const yeniKonu = prompt("Yeni konuyu girin:", ders.konu);
-            const yeniUcret = prompt("Ücret ödendi mi? (Evet/Hayır):", ders.ucret);
-
-            if (yeniTarih && yeniSaat && yeniKonu) {
-                ogrenciler[ogrenciIndex].dersler[dersIndex] = { tarih: yeniTarih, saat: yeniSaat, konu: yeniKonu, ucret: yeniUcret };
-                dersListesiniGuncelle(ogrenciIndex);
-                alert("Ders güncellendi!");
-            } else {
-                alert("Tüm bilgileri doldurmanız gerekmektedir.");
-            }
-        }
+        dateInput.valueAsDate = new Date();
+        loadForDate();
     </script>
 </body>
 </html>
