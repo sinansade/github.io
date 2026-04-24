@@ -1,311 +1,551 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğrenci Takip Sistemi</title>
-    <style>
-        body {
-            background-image: url('background.png');
-            background-size: cover;
-            background-position: center;
-            margin: 0;
-            font-family: 'Roboto', sans-serif;
-            color: #e0e0e0;
-            background-color: #1a1a1a;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NebulaYZ | AI Studio</title>
+  <style>
+    :root {
+      --bg: #060914;
+      --panel: rgba(16, 22, 44, 0.72);
+      --panel-border: rgba(125, 157, 255, 0.35);
+      --text: #e8edff;
+      --muted: #a9b5e2;
+      --primary: #7b5cff;
+      --secondary: #15d8ff;
+      --success: #2bd67b;
+      --danger: #ff6584;
+      --shadow: 0 20px 45px rgba(3, 8, 25, 0.55);
+    }
 
-        h1 {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 2.5em;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000000;
-        }
+    * { box-sizing: border-box; }
 
-        .button-container, .form-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            margin-top: 50px;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 18%, rgba(123, 92, 255, 0.4), transparent 35%),
+        radial-gradient(circle at 82% 10%, rgba(21, 216, 255, 0.38), transparent 32%),
+        radial-gradient(circle at 52% 82%, rgba(80, 126, 255, 0.35), transparent 42%),
+        linear-gradient(135deg, #050812 0%, #070b18 35%, #0a0f24 100%);
+      overflow-x: hidden;
+    }
 
-        .button-container button, .form-container button {
-            margin: 10px;
-            padding: 15px 30px;
-            font-size: 18px;
-            cursor: pointer;
-            background-color: #2b2b2b;
-            color: #ffffff;
-            border: 2px solid #3a3a3a;
-            border-radius: 10px;
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-            box-shadow: 2px 2px 5px #000000;
-        }
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.12;
+      background-image: radial-gradient(rgba(255,255,255,0.25) 0.8px, transparent 0.8px);
+      background-size: 3px 3px;
+    }
 
-        .button-container button:hover, .form-container button:hover {
-            background-color: #3a3a3a;
-            transform: scale(1.05);
-            box-shadow: 4px 4px 10px #000000;
-        }
+    .container {
+      width: min(1140px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding-bottom: 3rem;
+    }
 
-        .form-container input, .form-container select {
-            padding: 12px;
-            margin: 12px 0;
-            width: 270px;
-            box-sizing: border-box;
-            border-radius: 10px;
-            border: 2px solid #555555;
-            background-color: #2b2b2b;
-            color: #ffffff;
-            box-shadow: inset 1px 1px 3px #000000;
-        }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.3rem 0;
+      gap: 1rem;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
 
-        .content {
-            margin-top: 20px;
-            text-align: center;
-        }
+    .logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      background: conic-gradient(from 120deg, var(--primary), var(--secondary), var(--primary));
+      box-shadow: 0 0 22px rgba(123, 92, 255, 0.55);
+      position: relative;
+    }
 
-        .form-container p {
-            margin: 0;
-            font-weight: bold;
-            color: #ffffff;
-        }
+    .logo::after {
+      content: "";
+      position: absolute;
+      inset: 6px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
 
-        .ders-bilgileri {
-            margin-top: 20px;
-            text-align: left;
-        }
+    .credit-chip {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(8, 12, 30, 0.75);
+      border-radius: 999px;
+      padding: 0.55rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+    }
 
-        .ders-bilgileri ul {
-            list-style-type: none;
-            padding: 0;
-        }
+    .credit-chip strong { color: #fff; }
 
-        .ders-bilgileri li {
-            margin: 10px 0;
-            background-color: #2b2b2b;
-            padding: 12px;
-            border-radius: 10px;
-            cursor: pointer;
-            color: #ffffff;
-            border: 2px solid #3a3a3a;
-            box-shadow: 2px 2px 5px #000000;
-            position: relative;
-        }
+    .hero,
+    .glass {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 24px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+    }
 
-        .ders-bilgileri li:hover {
-            background-color: #3a3a3a;
-            transform: scale(1.02);
-            box-shadow: 4px 4px 10px #000000;
-        }
+    .hero {
+      padding: clamp(1.5rem, 2.4vw, 2.2rem);
+      margin-bottom: 1.3rem;
+    }
 
-        .sil-buton {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background-color: #ff4c4c;
-            color: #ffffff;
-            border: none;
-            border-radius: 50%;
-            padding: 5px;
-            cursor: pointer;
-            font-size: 12px;
-        }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.6rem, 4vw, 3rem);
+      line-height: 1.08;
+      max-width: 16ch;
+    }
 
-        .sil-buton:hover {
-            background-color: #ff1c1c;
-        }
-    </style>
+    .gradient-text {
+      background: linear-gradient(90deg, #fff 10%, #95a9ff 45%, #74e5ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      max-width: 70ch;
+      margin: 1rem 0 1.2rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      color: #fff;
+      border-radius: 14px;
+      padding: 0.76rem 1.2rem;
+      font-weight: 600;
+      transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: linear-gradient(90deg, var(--primary), #6f86ff);
+      box-shadow: 0 8px 25px rgba(123, 92, 255, 0.45);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(90deg, #0cb8f1, var(--secondary));
+      box-shadow: 0 8px 25px rgba(21, 216, 255, 0.35);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text);
+    }
+
+    .grid {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1.5fr 1fr;
+    }
+
+    .glass { padding: 1rem; }
+
+    .tabs {
+      display: inline-flex;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 0.25rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--muted);
+      border-radius: 10px;
+      padding: 0.55rem 1rem;
+    }
+
+    .tab-btn.active {
+      background: rgba(123, 92, 255, 0.25);
+      color: #fff;
+      border: 1px solid rgba(149, 169, 255, 0.3);
+    }
+
+    label {
+      display: block;
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin: 0.6rem 0 0.35rem;
+    }
+
+    textarea,
+    select,
+    input[type="text"] {
+      width: 100%;
+      padding: 0.8rem 0.85rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(4, 8, 24, 0.8);
+      color: #fff;
+      font-size: 0.95rem;
+      resize: vertical;
+    }
+
+    .usage {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin: 0.9rem 0;
+    }
+
+    .usage-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 14px;
+      padding: 0.7rem;
+      text-align: center;
+    }
+
+    .usage-card strong {
+      display: block;
+      font-size: 1.15rem;
+      margin-top: 0.2rem;
+    }
+
+    .status {
+      margin-top: 0.8rem;
+      min-height: 1.4rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .preview {
+      min-height: 160px;
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 1rem;
+      color: var(--muted);
+      background: rgba(2, 5, 16, 0.6);
+    }
+
+    .packages {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 0.35rem;
+    }
+
+    .package {
+      border-radius: 16px;
+      padding: 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .package strong { display: block; }
+
+    .tag {
+      font-size: 0.74rem;
+      color: #05102f;
+      background: linear-gradient(90deg, #b2c2ff, #7cf3ff);
+      padding: 0.18rem 0.45rem;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-left: 0.45rem;
+    }
+
+    .transactions {
+      margin-top: 0.9rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 0.7rem;
+    }
+
+    .transactions ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 200px;
+      overflow: auto;
+    }
+
+    .transactions li {
+      padding: 0.55rem 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .ok { color: var(--success); }
+    .warn { color: #ffd866; }
+    .bad { color: var(--danger); }
+
+    footer {
+      text-align: center;
+      color: #8998cb;
+      font-size: 0.85rem;
+      margin-top: 1.2rem;
+    }
+
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <h1>Öğrenci Takip Sistemi</h1>
-    <div class="button-container">
-        <button onclick="ogrenciListesiniGoster()">Öğrenci Listesi</button>
-        <button onclick="ogrenciEklemeFormuGoster()">Öğrenci Ekle</button>
-    </div>
+  <div class="noise"></div>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <span>NebulaYZ <span style="color: var(--muted); font-weight: 500;">AI Studio</span></span>
+      </div>
+      <div class="credit-chip">⚡ Kontör: <strong id="creditBalance">120</strong></div>
+    </header>
 
-    <div id="ogrenci-listesi" class="content hidden">
-        <h2>Öğrenci Listesi</h2>
-        <ul id="ogrenciler"></ul>
-        <button onclick="geriDon()">Geri Dön</button>
-    </div>
+    <section class="hero">
+      <h1><span class="gradient-text">Yeni Nesil Yapay Zeka Üretim Merkezi</span></h1>
+      <p>
+        Metinden görsel/video üret, hızlı denemeler yap ve kontör tabanlı kullanım modelini canlı bir şekilde test et.
+        Bu sürüm demo amaçlıdır: gerçek API, gerçek ödeme ve muhasebe bağlantısı yoktur.
+      </p>
+      <div class="quick-actions">
+        <button class="btn-primary" onclick="focusPrompt()">Hemen Üret</button>
+        <button class="btn-secondary" onclick="scrollToPackages()">Kontör Satın Al</button>
+        <button class="btn-ghost" onclick="demoFill()">Örnek Prompt Doldur</button>
+      </div>
+    </section>
 
-    <div id="ogrenci-bilgileri" class="content hidden">
-        <h2>Yeni Öğrenci Ekle</h2>
-        <div class="form-container">
-            <p>Ad:</p> <input type="text" id="yeniAd">
-            <p>Soyad:</p> <input type="text" id="yeniSoyad">
-            <p>Ders Ücreti:</p> <input type="number" id="yeniUcret">
-            <button onclick="yeniOgrenciEkle()">Öğrenciyi Kaydet</button>
-            <button onclick="geriDon()">Geri Dön</button>
+    <section class="grid">
+      <article class="glass">
+        <div class="tabs" role="tablist" aria-label="Üretim modu">
+          <button class="tab-btn active" data-mode="image" onclick="switchMode('image', this)">🎨 Görsel Üret</button>
+          <button class="tab-btn" data-mode="video" onclick="switchMode('video', this)">🎬 Video Üret</button>
         </div>
-    </div>
 
-    <div id="ogrenci-detay" class="content hidden">
-        <h2 id="ogrenciAdi"></h2>
-        <div class="form-container">
-            <p>Ders Tarihi:</p> <input type="date" id="dersTarihi">
-            <p>Ders Saati:</p> <input type="time" id="dersSaati">
-            <p>Ders Konusu:</p> <input type="text" id="dersKonusu">
-            <p>Ücret Ödendi mi?</p> 
-            <select id="ucretOdenme">
-                <option value="Hayır">Hayır</option>
-                <option value="Evet">Evet</option>
-            </select>
-            <button onclick="dersEkle()">Ders Ekle</button>
-            <button onclick="geriDon()">Geri Dön</button>
+        <label for="prompt">Prompt</label>
+        <textarea id="prompt" rows="5" placeholder="Örn: neon ışıklı, cyberpunk şehirde uçan araçlar..."></textarea>
+
+        <div class="usage">
+          <div class="usage-card">Anlık Mod<strong id="modeLabel">Görsel</strong></div>
+          <div class="usage-card">Kontör Maliyeti<strong id="costLabel">12</strong></div>
+          <div class="usage-card">Kalan Kontör<strong id="remainingLabel">120</strong></div>
         </div>
-        <div class="ders-bilgileri">
-            <h3>Mevcut Dersler</h3>
-            <ul id="dersListesi"></ul>
+
+        <label for="quality">Kalite Profili</label>
+        <select id="quality">
+          <option value="standard">Standard (x1)</option>
+          <option value="pro">Pro (x1.6)</option>
+          <option value="ultra">Ultra (x2.2)</option>
+        </select>
+
+        <div style="display:flex; gap:.6rem; margin-top: 0.9rem; flex-wrap:wrap;">
+          <button class="btn-primary" onclick="runGeneration()">Üretimi Başlat</button>
+          <button class="btn-ghost" onclick="clearPrompt()">Temizle</button>
         </div>
-    </div>
 
-    <script>
-        let ogrenciler = [];
+        <div id="status" class="status">Hazır. Bir prompt yazarak üretime başlayabilirsin.</div>
+        <div id="preview" class="preview">Üretim sonucu burada görünecek (demo simülasyon).</div>
+      </article>
 
-        function ogrenciListesiniGoster() {
-            document.getElementById('ogrenci-listesi').classList.remove('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
-            listeyiGuncelle();
-        }
+      <aside class="glass" id="packages">
+        <h3 style="margin: 0 0 0.75rem;">Kontör Mağazası</h3>
+        <p style="margin:0; color: var(--muted); font-size:.92rem;">
+          Ödemeler tamamen simüle edilir. Gerçek kart/ödeme altyapısı entegre değildir.
+        </p>
 
-        function ogrenciEklemeFormuGoster() {
-            document.getElementById('ogrenci-bilgileri').classList.remove('hidden');
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
-        }
+        <div class="packages">
+          <div class="package">
+            <div>
+              <strong>Başlangıç Paketi</strong>
+              <small style="color:var(--muted)">100 kontör · ₺149</small>
+            </div>
+            <button class="btn-ghost" onclick="buyCredits(100, 149, 'Başlangıç Paketi')">Satın Al</button>
+          </div>
 
-        function geriDon() {
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.add('hidden');
-            document.querySelector('.button-container').classList.remove('hidden');
-        }
+          <div class="package">
+            <div>
+              <strong>Creator Paketi <span class="tag">Popüler</span></strong>
+              <small style="color:var(--muted)">300 kontör · ₺349</small>
+            </div>
+            <button class="btn-secondary" onclick="buyCredits(300, 349, 'Creator Paketi')">Satın Al</button>
+          </div>
 
-        function yeniOgrenciEkle() {
-            const ad = document.getElementById('yeniAd').value;
-            const soyad = document.getElementById('yeniSoyad').value;
-            const ucret = document.getElementById('yeniUcret').value;
+          <div class="package">
+            <div>
+              <strong>Studio Pro</strong>
+              <small style="color:var(--muted)">1000 kontör · ₺899</small>
+            </div>
+            <button class="btn-primary" onclick="buyCredits(1000, 899, 'Studio Pro')">Satın Al</button>
+          </div>
+        </div>
 
-            if (ad && soyad && ucret) {
-                ogrenciler.push({ ad: ad, soyad: soyad, ucret: ucret, dersler: [] });
-                document.getElementById('yeniAd').value = '';
-                document.getElementById('yeniSoyad').value = '';
-                document.getElementById('yeniUcret').value = '';
-                alert(ad + " " + soyad + " eklendi!");
-            } else {
-                alert("Lütfen tüm bilgileri doldurun.");
-            }
-        }
+        <div class="transactions">
+          <h4 style="margin:.2rem 0 .4rem;">İşlem Geçmişi</h4>
+          <ul id="txList"></ul>
+        </div>
+      </aside>
+    </section>
 
-        function listeyiGuncelle() {
-            const ogrenciListesi = document.getElementById('ogrenciler');
-            ogrenciListesi.innerHTML = '';
+    <footer>
+      NebulaYZ Demo • API entegrasyonu kapalı • Sanal ödeme ve sanal üretim simülasyonu
+    </footer>
+  </div>
 
-            ogrenciler.forEach((ogrenci, index) => {
-                const li = document.createElement('li');
-                li.textContent = ogrenci.ad + " " + ogrenci.soyad;
-                li.onclick = () => ogrenciBilgileriniGoster(index);
+  <script>
+    const state = {
+      credits: 120,
+      mode: 'image',
+      baseCosts: { image: 12, video: 45 },
+      qualityMult: { standard: 1, pro: 1.6, ultra: 2.2 }
+    };
 
-                // Öğrenci silme butonu
-                const silButon = document.createElement('button');
-                silButon.textContent = 'X';
-                silButon.className = 'sil-buton';
-                silButon.onclick = (event) => {
-                    event.stopPropagation();
-                    ogrenciSil(index);
-                };
+    function updateCreditsUI() {
+      document.getElementById('creditBalance').textContent = state.credits;
+      document.getElementById('remainingLabel').textContent = state.credits;
+    }
 
-                li.appendChild(silButon);
-                ogrenciListesi.appendChild(li);
-            });
-        }
+    function getCurrentCost() {
+      const quality = document.getElementById('quality').value;
+      const cost = Math.ceil(state.baseCosts[state.mode] * state.qualityMult[quality]);
+      return cost;
+    }
 
-        function ogrenciBilgileriniGoster(index) {
-            const ogrenci = ogrenciler[index];
-            document.getElementById('ogrenciAdi').textContent = ogrenci.ad + " " + ogrenci.soyad;
-            document.getElementById('ogrenci-listesi').classList.add('hidden');
-            document.getElementById('ogrenci-bilgileri').classList.add('hidden');
-            document.getElementById('ogrenci-detay').classList.remove('hidden');
-            document.querySelector('.button-container').classList.add('hidden');
-            dersListesiniGuncelle(index);
-        }
+    function updateCostUI() {
+      document.getElementById('modeLabel').textContent = state.mode === 'image' ? 'Görsel' : 'Video';
+      document.getElementById('costLabel').textContent = getCurrentCost();
+      updateCreditsUI();
+    }
 
-        function dersEkle() {
-            const tarih = document.getElementById('dersTarihi').value;
-            const saat = document.getElementById('dersSaati').value;
-            const konu = document.getElementById('dersKonusu').value;
-            const ucret = document.getElementById('ucretOdenme').value;
-            const index = ogrenciler.findIndex(o => o.ad + " " + o.soyad === document.getElementById('ogrenciAdi').textContent);
+    function switchMode(mode, btn) {
+      state.mode = mode;
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      btn.classList.add('active');
+      updateCostUI();
+      setStatus(mode === 'image' ? 'Görsel üretim moduna geçildi.' : 'Video üretim moduna geçildi.', 'ok');
+    }
 
-            if (tarih && saat && konu) {
-                ogrenciler[index].dersler.push({ tarih: tarih, saat: saat, konu: konu, ucret: ucret });
-                dersListesiniGuncelle(index);
-                alert("Ders eklendi!");
-            } else {
-                alert("Lütfen tüm bilgileri doldurun.");
-            }
-        }
+    function setStatus(message, type = '') {
+      const status = document.getElementById('status');
+      status.className = `status ${type}`.trim();
+      status.textContent = message;
+    }
 
-        function dersListesiniGuncelle(index) {
-            const dersListesi = document.getElementById('dersListesi');
-            dersListesi.innerHTML = '';
+    function addTransaction(text) {
+      const li = document.createElement('li');
+      const now = new Date().toLocaleString('tr-TR');
+      li.textContent = `[${now}] ${text}`;
+      const list = document.getElementById('txList');
+      list.prepend(li);
+    }
 
-            ogrenciler[index].dersler.forEach((ders, dersIndex) => {
-                const li = document.createElement('li');
-                li.textContent = (dersIndex + 1) + ". Ders - Tarih: " + ders.tarih + " Saat: " + ders.saat + ", Konu: " + ders.konu + ", Ücret Ödendi mi?: " + ders.ucret;
+    function runGeneration() {
+      const prompt = document.getElementById('prompt').value.trim();
+      const cost = getCurrentCost();
 
-                // Ders silme butonu
-                const silButon = document.createElement('button');
-                silButon.textContent = 'X';
-                silButon.className = 'sil-buton';
-                silButon.onclick = (event) => {
-                    event.stopPropagation();
-                    dersSil(index, dersIndex);
-                };
+      if (!prompt) {
+        setStatus('Lütfen önce prompt yaz.', 'warn');
+        return;
+      }
 
-                li.appendChild(silButon);
-                dersListesi.appendChild(li);
-            });
-        }
+      if (state.credits < cost) {
+        setStatus(`Yetersiz kontör. Gerekli: ${cost}, mevcut: ${state.credits}.`, 'bad');
+        return;
+      }
 
-        function dersSil(ogrenciIndex, dersIndex) {
-            ogrenciler[ogrenciIndex].dersler.splice(dersIndex, 1);
-            dersListesiniGuncelle(ogrenciIndex);
-            alert("Ders silindi!");
-        }
+      state.credits -= cost;
+      updateCostUI();
 
-        function ogrenciSil(index) {
-            ogrenciler.splice(index, 1);
-            listeyiGuncelle();
-            alert("Öğrenci silindi!");
-        }
+      setStatus(`${state.mode === 'image' ? 'Görsel' : 'Video'} üretimi simüle ediliyor... (${cost} kontör harcandı)`, 'ok');
+      addTransaction(`${state.mode === 'image' ? 'Görsel' : 'Video'} üretim isteği: -${cost} kontör`);
 
-        function dersDuzenle(ogrenciIndex, dersIndex) {
-            const ders = ogrenciler[ogrenciIndex].dersler[dersIndex];
-            const yeniTarih = prompt("Yeni tarih girin (YYYY-AA-GG):", ders.tarih);
-            const yeniSaat = prompt("Yeni saat girin (SS:DD):", ders.saat);
-            const yeniKonu = prompt("Yeni konuyu girin:", ders.konu);
-            const yeniUcret = prompt("Ücret ödendi mi? (Evet/Hayır):", ders.ucret);
+      const preview = document.getElementById('preview');
+      preview.innerHTML = '⏳ Yapay zeka çekirdeği çalışıyor...';
 
-            if (yeniTarih && yeniSaat && yeniKonu) {
-                ogrenciler[ogrenciIndex].dersler[dersIndex] = { tarih: yeniTarih, saat: yeniSaat, konu: yeniKonu, ucret: yeniUcret };
-                dersListesiniGuncelle(ogrenciIndex);
-                alert("Ders güncellendi!");
-            } else {
-                alert("Tüm bilgileri doldurmanız gerekmektedir.");
-            }
-        }
-    </script>
+      setTimeout(() => {
+        const label = state.mode === 'image' ? 'Görsel' : 'Video';
+        preview.innerHTML = `<strong>${label} çıktısı hazır (Demo)</strong><br><small style="color:#9fb0e8">Prompt: ${escapeHtml(prompt)}</small>`;
+        setStatus(`${label} üretimi tamamlandı. Sonuç demodur, gerçek API çağrısı yapılmadı.`, 'ok');
+      }, 1200);
+    }
+
+    function buyCredits(amount, price, packageName) {
+      const accepted = confirm(`${packageName} satın alımı simüle edilsin mi?\n+${amount} kontör | ₺${price}`);
+      if (!accepted) {
+        setStatus('Satın alma simülasyonu iptal edildi.', 'warn');
+        return;
+      }
+
+      state.credits += amount;
+      updateCostUI();
+      addTransaction(`${packageName} satın alımı: +${amount} kontör (Demo ₺${price})`);
+      setStatus(`${packageName} başarıyla eklendi. (+${amount} kontör)`, 'ok');
+    }
+
+    function clearPrompt() {
+      document.getElementById('prompt').value = '';
+      document.getElementById('preview').textContent = 'Üretim sonucu burada görünecek (demo simülasyon).';
+      setStatus('Prompt temizlendi.', '');
+    }
+
+    function focusPrompt() {
+      document.getElementById('prompt').focus();
+    }
+
+    function scrollToPackages() {
+      document.getElementById('packages').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function demoFill() {
+      const text = state.mode === 'image'
+        ? 'Sinematik ışıklarla, futuristik İstanbul silüeti, detaylı dijital sanat'
+        : 'Neon bir şehirde yağmur altında koşan android karakter, sinematik kamera hareketi';
+      document.getElementById('prompt').value = text;
+      setStatus('Örnek prompt eklendi. Üretime hazırsın.', 'ok');
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    document.getElementById('quality').addEventListener('change', updateCostUI);
+
+    updateCostUI();
+    addTransaction('Sisteme giriş yapıldı. Hoş geldin!');
+  </script>
 </body>
 </html>
